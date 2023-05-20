@@ -32,7 +32,7 @@ def main() -> int:
     if not success:
         logger.error(f"Getting data from html failed: {error}")
         return 1
-
+    
     (success, error, game_results) = get_game_results_from_data(data)
     if not success:
         logger.error(f"Getting game results from data failed: {error}")
@@ -59,8 +59,10 @@ def main() -> int:
         logger.error(f"Writing scores to 'index.html' failed': {error}")
         return 1
 
-    # score_json = json.dumps(score)
-    # print(score_json)
+    score_json = json.dumps(score)
+
+    print(last_game_result)
+    print(score_json)
 
     logger.info(f"Succesfully got results, and wrote to HTML file.")
     return 0

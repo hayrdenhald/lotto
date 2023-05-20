@@ -16,7 +16,7 @@ class GameResult():
             draw_id: int,
             date_raw: str,
             is_finalized_raw: str,
-            draw_number_raw: list[dict[str, str | int]]
+            draw_number_raw: list[dict]
     ):
         self.draw_id = draw_id
         self._date = datetime.fromisoformat(date_raw).strftime('%Y/%m/%d %H:%M')
