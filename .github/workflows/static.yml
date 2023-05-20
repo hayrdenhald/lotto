@@ -6,7 +6,7 @@ on:
   push:
     branches: ["main"]
   schedule:
-      - cron: '32 20 * * 6' # At 20:12 every Saturday
+      - cron: '37 20 * * 6'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
