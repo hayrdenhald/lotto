@@ -1,8 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Dict, List
 
-from draw_number import DrawNumber
+from draw_numbers import DrawNumber
 
 
 @dataclass
@@ -17,11 +16,10 @@ class GameResult():
             draw_id: int,
             date_raw: str,
             is_finalized_raw: str,
-            draw_number_raw: List[Dict[str, str | int]]
+            draw_number_raw: list[dict[str, str | int]]
     ):
         self.draw_id = draw_id
-        self._date = datetime.fromisoformat(
-            date_raw).strftime('%Y/%m/%d %H:%M')
+        self._date = datetime.fromisoformat(date_raw).strftime('%Y/%m/%d %H:%M')
         self.is_finalized = bool(is_finalized_raw)
         self._draw_numbers = self.parse_draw_number(draw_number_raw)
 
@@ -38,9 +36,9 @@ class GameResult():
         return DrawNumber(standard, extra)
 
     @property
-    def date(self):
+    def date(self) -> str:
         return self._date
 
     @property
-    def draw_numbers(self):
+    def draw_numbers(self) -> DrawNumber:
         return self._draw_numbers

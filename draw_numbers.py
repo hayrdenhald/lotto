@@ -1,10 +1,9 @@
 from dataclasses import dataclass
-from typing import List
 
 
 @dataclass
 class DrawNumber():
-    standard: List[int]
+    standard: list[int]
     extra: int
 
     def __str__(self) -> str:

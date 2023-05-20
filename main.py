@@ -1,9 +1,11 @@
 import logging
 import logging.handlers
-import os
 import sys
 
+from draw_numbers import DrawNumber
 from game_result_parser import *
+from result_checker import (get_lotto_numbers_from_environment,
+                            score_all_numbers)
 from write_to_html import HtmlWriter
 
 logger = logging.getLogger(__name__)
@@ -36,17 +38,29 @@ def main() -> int:
         logger.error(f"Getting game results from data failed: {error}")
         return 1
 
-    (success, error) = HtmlWriter.write_result_to_html(game_results[0])
+    last_game_result = game_results[0]
+    
+    (success, error) = HtmlWriter.write_result_to_html(last_game_result)
     if not success:
         logger.error(f"Writing result to 'index.html' failed: {error}")
         return 1
 
-    # try:
-    #     SOME_SECRET = os.environ["SOME_SECRET"]
-    # except KeyError:
-    #     SOME_SECRET = "Token not available!"
-    #     logger.info("Token not available!")
-    #     # raise
+    (success, error, my_lotto_numbers) = get_lotto_numbers_from_environment()
+    if not success:
+        logger.error(f"Failed to get lotto numbers from the environment: {error}")
+        return 1
+
+    score = score_all_numbers(
+        lotto_numbers=my_lotto_numbers, draw=last_game_result.draw_numbers
+    )
+
+    (success, error) = HtmlWriter.write_scores_to_html(score)
+    if not success:
+        logger.error(f"Writing scores to 'index.html' failed': {error}")
+        return 1
+
+    # score_json = json.dumps(score)
+    # print(score_json)
 
     logger.info(f"Succesfully got results, and wrote to HTML file.")
     return 0

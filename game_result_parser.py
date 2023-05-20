@@ -77,14 +77,13 @@ def get_game_results_from_data(data: dict[str, Any]) -> tuple[bool, str,  list[G
     game_results: list[GameResult] = []
 
     for game_result_raw in game_results_raw:
-        game_results.append(
-            GameResult(
-                game_result_raw['drawId'],
-                game_result_raw['drawDate'],
-                game_result_raw['isFinalized'],
-                game_result_raw['winnerNumber'],
-            )
-        )
+        game_result = GameResult(
+            game_result_raw['drawId'],
+            game_result_raw['drawDate'],
+            game_result_raw['isFinalized'],
+            game_result_raw['winnerNumber'],
+        ) 
+        game_results.append(game_result)
 
     if not game_results:
         success = False
