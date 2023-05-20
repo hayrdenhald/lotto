@@ -1,6 +1,5 @@
 import json
-import sys
-from typing import Dict, List, Tuple
+from typing import Any
 
 import requests
 from bs4 import BeautifulSoup
@@ -9,52 +8,87 @@ from game_result import GameResult
 
 WEBSITE_URL = "https://www.norsk-tipping.no/lotteri/lotto/resultater"
 
-def get_html_from_url(url: str) -> Tuple[bool, str]:
+
+def get_html_from_url(url: str) -> tuple[bool, str, str]:
     response = requests.get(WEBSITE_URL)
     if response.status_code == 200:
         html = response.text
         success = True
-        return (success, html)
+        return (success, "", html)
     else:
         success = False
-        return (success, response.text)
-    
-def get_data_from_html(html: str) -> Dict[str, str | int]:
+        error = f"Getting HTML from url failed, status code: {response.status_code}"
+        return (success, error, response.text)
+
+
+def get_data_from_html(html: str) -> tuple[bool, str, dict]:
     soup = BeautifulSoup(html, 'lxml')
     scripts = soup.findAll('script')
     SCRIPT_IDX = 4
     script = scripts[SCRIPT_IDX].prettify()
-    STR_START = 'window.__PRELOADED_USE_API__ = '
-    STR_STOP = "\n      window.__NT_ENV__ = "
-    start = script.find(STR_START)
-    stop = script.find(STR_STOP)
+
+    success, pertinent = get_text_section_between(
+        script,
+        start_excl="window.__PRELOADED_USE_API__ = ",
+        stop_excl="\n      window.__NT_ENV__ = "
+    )
+    if not success:
+        error = "Getting a inbetween text section (PRELOADED_USE_API) failed!"
+        return (success, error, {})
+
+    json_object = json.loads(json.loads(pertinent))
+
+    success, base_key = get_text_section_between(
+        str(json_object),
+        start_excl="{'",
+        stop_excl="':"
+    )
+    if not success:
+        error = "Getting a inbetween text section (base_key) failed!"
+        return (success, error, {})
+
+    base = json_object[base_key]
+    data = base['data']
+
+    success = True
+    return (success, "", data)
+
+
+def get_text_section_between(text: str, start_excl: str, stop_excl) -> tuple[bool, str]:
+    start = text.find(start_excl)
+    stop = text.find(stop_excl)
 
     if start == -1 or stop == -1:
         success = False
-        return (success, {})
+        return (success, "")
 
-    pertinent = script[start + len(STR_START):stop]
-    json_object = json.loads(json.loads(pertinent))
-    BASE_KEY = "base:https://api.norsk-tipping.no/LotteryGameInfo/v2/api/results/lotto?fromDate=2023-01-30&toDate=2023-05-16"
-    base = json_object[BASE_KEY]
-    data = base['data']
+    section = text[start + len(start_excl):stop]
     success = True
+    return (success, section)
 
-    return (success, data)
 
-def get_game_results_from_data(data: Dict[str, str | int]) -> List[GameResult]:
-        game_results = data['gameResult']
+def get_game_results_from_data(data: dict[str, Any]) -> tuple[bool, str,  list[GameResult]]:
+    if 'gameResult' not in data:
+        success = False
+        return (success, "The data does not contain the key 'gameResult'", [])
 
-        games: List[GameResult] = []
+    game_results_raw = data['gameResult']
 
-        for game_result in game_results:
-            games.append(
-                GameResult(
-                    game_result['drawId'],
-                    game_result['drawDate'],
-                    game_result['isFinalized'],
-                    game_result['winnerNumber'],
-                )
+    game_results: list[GameResult] = []
+
+    for game_result_raw in game_results_raw:
+        game_results.append(
+            GameResult(
+                game_result_raw['drawId'],
+                game_result_raw['drawDate'],
+                game_result_raw['isFinalized'],
+                game_result_raw['winnerNumber'],
             )
-    
-        return games
+        )
+
+    if not game_results:
+        success = False
+        return (success, "No game results found during parsing of data!", [])
+
+    success = True
+    return (success, "", game_results)
