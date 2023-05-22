@@ -3,7 +3,6 @@ import logging.handlers
 import os
 import sys
 
-from draw_numbers import DrawNumber
 from game_result_parser import *
 from result_checker import (get_lotto_numbers_from_environment,
                             score_all_numbers)
