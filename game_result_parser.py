@@ -6,11 +6,8 @@ from bs4 import BeautifulSoup
 
 from game_result import GameResult
 
-WEBSITE_URL = "https://www.norsk-tipping.no/lotteri/lotto/resultater"
-
-
 def get_html_from_url(url: str) -> tuple[bool, str, str]:
-    response = requests.get(WEBSITE_URL)
+    response = requests.get(url)
     if response.status_code == 200:
         html = response.text
         success = True

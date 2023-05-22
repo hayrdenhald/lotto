@@ -1,5 +1,6 @@
 import logging
 import logging.handlers
+import os
 import sys
 
 from draw_numbers import DrawNumber
@@ -22,9 +23,15 @@ formatter = logging.Formatter(
 logger_file_handler.setFormatter(formatter)
 logger.addHandler(logger_file_handler)
 
+API_URL_ENV_VAR = "API_URL"
 
 def main() -> int:
-    (success, error, html) = get_html_from_url(WEBSITE_URL)
+    api_url = os.environ.get(API_URL_ENV_VAR)
+    if not api_url:
+        logger.error(f"Failed to get api url {API_URL_ENV_VAR} from the environment")
+        return 1
+
+    (success, error, html) = get_html_from_url(api_url)
     if not success:
         return 1
 
@@ -64,7 +71,7 @@ def main() -> int:
     print(last_game_result)
     print(score_json)
 
-    logger.info(f"Succesfully got results, and wrote to HTML file.")
+    logger.info("Successfully received, parsed and handled results!")
     return 0
 
 
