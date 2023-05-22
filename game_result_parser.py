@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 
 from game_result import GameResult
 
+
 def get_html_from_url(url: str) -> tuple[bool, str, str]:
     response = requests.get(url)
     if response.status_code == 200:

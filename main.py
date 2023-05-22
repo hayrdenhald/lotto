@@ -27,7 +27,7 @@ API_URL_ENV_VAR = "API_URL"
 def main() -> int:
     api_url = os.environ.get(API_URL_ENV_VAR)
     if not api_url:
-        logger.error(f"Failed to get api url {API_URL_ENV_VAR} from the environment")
+        logger.debug(f"Failed to get api url {API_URL_ENV_VAR} from the environment")
         return 1
 
     (success, error, html) = get_html_from_url(api_url)
@@ -36,24 +36,24 @@ def main() -> int:
 
     (success, error, data) = get_data_from_html(html)
     if not success:
-        logger.error(f"Getting data from html failed: {error}")
+        logger.debug(f"Getting data from html failed: {error}")
         return 1
     
     (success, error, game_results) = get_game_results_from_data(data)
     if not success:
-        logger.error(f"Getting game results from data failed: {error}")
+        logger.debug(f"Getting game results from data failed: {error}")
         return 1
 
     last_game_result = game_results[0]
     
     (success, error) = HtmlWriter.write_result_to_html(last_game_result)
     if not success:
-        logger.error(f"Writing result to 'index.html' failed: {error}")
+        logger.debug(f"Writing result to 'index.html' failed: {error}")
         return 1
 
     (success, error, my_lotto_numbers) = get_lotto_numbers_from_environment()
     if not success:
-        logger.error(f"Failed to get lotto numbers from the environment: {error}")
+        logger.debug(f"Failed to get lotto numbers from the environment: {error}")
         return 1
 
     score = score_all_numbers(
@@ -62,7 +62,7 @@ def main() -> int:
 
     (success, error) = HtmlWriter.write_scores_to_html(score)
     if not success:
-        logger.error(f"Writing scores to 'index.html' failed': {error}")
+        logger.debug(f"Writing scores to 'index.html' failed': {error}")
         return 1
 
     score_json = json.dumps(score)
