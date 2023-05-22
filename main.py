@@ -25,7 +25,8 @@ logger.addHandler(logger_file_handler)
 API_URL_ENV_VAR = "API_URL"
 
 def main() -> int:
-    api_url = os.environ.get(API_URL_ENV_VAR)
+    # api_url = os.environ.get(API_URL_ENV_VAR)
+    api_url = "https://www.norsk-tipping.no/lotteri/lotto/resultater"
     if not api_url:
         logger.debug(f"Failed to get api url {API_URL_ENV_VAR} from the environment")
         return 1
@@ -65,10 +66,10 @@ def main() -> int:
         logger.debug(f"Writing scores to 'index.html' failed': {error}")
         return 1
 
-    score_json = json.dumps(score)
+    # score_json = json.dumps(score)
 
-    print(last_game_result)
-    print(score_json)
+    # print(last_game_result)
+    # print(score_json)
 
     logger.info("Successfully received, parsed and handled results!")
     return 0
