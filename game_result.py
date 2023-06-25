@@ -32,7 +32,7 @@ class GameResult():
             if type == 2:
                 extra = number
             else:
-                standard.append(number)
+                standard.append(int(number))
         return DrawNumber(standard, extra)
 
     @property
