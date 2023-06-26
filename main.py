@@ -47,9 +47,9 @@ def main() -> int:
 
     last_game_result = game_results[0]
     
-    (success, error) = HtmlWriter.write_result_to_html(last_game_result)
+    (success, error) = HtmlWriter.write_game_result_to_html(last_game_result)
     if not success:
-        logger.debug(f"Writing result to 'index.html' failed: {error}")
+        logger.debug(f"Writing game result to 'index.html' failed: {error}")
         return 1
 
     (success, error, my_lotto_numbers) = get_lotto_numbers_from_environment()
@@ -66,12 +66,7 @@ def main() -> int:
         logger.debug(f"Writing scores to 'index.html' failed': {error}")
         return 1
 
-    # score_json = json.dumps(score)
-
-    # print(last_game_result)
-    # print(score_json)
-
-    logger.info("Successfully received, parsed and handled results!")
+    logger.info(f"Successfully received, parsed and handled result, score was: {score}")
     return 0
 
 

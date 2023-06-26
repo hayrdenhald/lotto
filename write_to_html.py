@@ -8,25 +8,35 @@ FILE_PATH = "index.html"
 class HtmlWriter():
 
     @staticmethod
-    def write_result_to_html(game_result: GameResult) -> tuple[bool, str]:
-        date = game_result.date
-        draw_numbers_and_extra = str(game_result.draw_numbers)
+    def write_game_result_to_html(game_result: GameResult) -> tuple[bool, str]:
+        timestamp = game_result.date
+        draw_standard = ', '.join(str(x) for x in game_result.draw_numbers.standard)
+        draw_extra = str(game_result.draw_numbers.extra)
 
         try:
             with open(FILE_PATH, 'r') as html:
                 soup = BeautifulSoup(html, 'lxml')
                 
-                date_h2 = soup.find("h2", {"id": "date"})
-                assert isinstance(date_h2, Tag)
-                new_date_h2 = soup.new_tag("h2", attrs={"id":"date"})
-                new_date_h2.insert(0, date)
-                date_h2.replace_with(new_date_h2)
+                HtmlWriter.create_tag_and_replace(soup,
+                    "h3",
+                    {"id":"timestamp"},
+                    timestamp
+                )
 
-                numbers_h3 = soup.find("h3", {"id": "numbers"})
-                assert isinstance(numbers_h3, Tag)
-                new_numbers_h3 = soup.new_tag("h3", attrs={"id":"numbers"})
-                new_numbers_h3.insert(0, draw_numbers_and_extra)
-                numbers_h3.replace_with(new_numbers_h3)
+                HtmlWriter.create_tag_and_replace(
+                    soup, 
+                    "h3",
+                    {"id": "draw-standard"},
+                    draw_standard
+                )
+
+                HtmlWriter.create_tag_and_replace(
+                    soup, 
+                    "h3", 
+                    {"id": "draw-extra"}, 
+                    f"extra: {draw_extra}"
+                )
+
                 
             with open(FILE_PATH, "wb") as file:
                 file.write(soup.prettify("utf-8"))
@@ -40,21 +50,38 @@ class HtmlWriter():
             return (success, error)
     
     @staticmethod
-    def write_scores_to_html(index_to_score: dict) -> tuple[bool, str]:
+    def create_tag_and_replace(soup: BeautifulSoup, tag: str, attrs: dict[str, str] = {}, to_insert: str = "") -> None:
+        old_tag = soup.find(tag, attrs)
+        assert isinstance(old_tag, Tag)
+        new_tag = soup.new_tag("h3", attrs=attrs)
+        if to_insert:
+            new_tag.insert(0, to_insert)
+        old_tag.replace_with(new_tag)
+
+    @staticmethod
+    def create_tag_and_append(soup: BeautifulSoup, tag: str, append_to: Tag, attrs: dict[str, str] = {}, to_insert: str = "") -> None:    
+        new_tag = soup.new_tag(tag, attrs=attrs)
+        if to_insert:
+            new_tag.insert(0, to_insert)
+        append_to.append(new_tag)
+
+    @staticmethod
+    def write_scores_to_html(index_to_table: dict) -> tuple[bool, str]:
         try:
             with open(FILE_PATH, 'r') as html:
                 soup = BeautifulSoup(html, 'lxml')
-                scores_ul = soup.find("ul", {"id": "scores"})
-                assert isinstance(scores_ul, Tag)
+                score_table = soup.find("table", {"id": "scores"})
+                assert isinstance(score_table, Tag)
 
-                new_scores_ul = soup.new_tag("ul", attrs={"id": "scores"})
+                new_score_table = soup.new_tag("table", attrs={"id": "scores"})
 
-                for idx, score in index_to_score.items():
-                    new_score_li = soup.new_tag("li", attrs={"id": f"score-{idx}"})
-                    new_score_li.insert(0, f"{idx}: {score}")
-                    new_scores_ul.append(new_score_li)
+                for idx, score in index_to_table.items():
+                    new_score_tr = soup.new_tag("tr")
+                    HtmlWriter.create_tag_and_append(soup, "td", new_score_tr, {"style": "text-align: right;"}, str(idx))
+                    HtmlWriter.create_tag_and_append(soup, "td", new_score_tr, {"id": f"score-{idx}", "style": "text-align: left;"}, score)
+                    new_score_table.append(new_score_tr)
                 
-                scores_ul.replace_with(new_scores_ul)
+                score_table.replace_with(new_score_table)
 
             with open(FILE_PATH, "wb") as file:
                 file.write(soup.prettify("utf-8"))
