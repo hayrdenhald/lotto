@@ -5,3 +5,4 @@
 2023-06-17 19:07:53,583 - __main__ - INFO - Successfully received, parsed and handled results!
 2023-06-18 16:24:51,984 - __main__ - INFO - Successfully received, parsed and handled results!
 2023-06-24 19:09:05,943 - __main__ - INFO - Successfully received, parsed and handled results!
+2023-07-01 19:08:17,931 - __main__ - INFO - Successfully received, parsed and handled result, score was: {'1': 'nothing', '2': 'nothing', '3': 'nothing', '4': 'nothing', '5': 'nothing', '6': 'is_4_correct', '7': 'nothing', '8': 'nothing', '9': 'nothing', '10': 'nothing'}
